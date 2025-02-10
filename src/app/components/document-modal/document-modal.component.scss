@@ -1,0 +1,15 @@
+.doc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 10px;
+}
+
+.switches {
+  display: flex;
+  gap: 16px;
+}
+
+.form-field {
+  flex: 1;
+}

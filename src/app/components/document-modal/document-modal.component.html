@@ -1,0 +1,179 @@
+<h2 mat-dialog-title>Реквизиты входящего документа</h2>
+<mat-dialog-content>
+  <form class="doc-form" [formGroup]="documentForm">
+    <div class="form-group">
+      <!-- Рег. № -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Рег. №</mat-label>
+        <input matInput formControlName="regNumber" />
+
+        @if (documentForm.get('regNumber')?.hasError('required')) {
+        <mat-error>Обязательное поле</mat-error>
+        } @if (documentForm.get('regNumber')?.hasError('pattern')) {
+        <mat-error>Должен содержать хотя бы одну цифру</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Дата рег. -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Дата рег.</mat-label>
+        <input
+          matInput
+          [matDatepicker]="regDatePicker"
+          formControlName="regDate"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="regDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #regDatePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <!-- № исх. док-та -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>№ исх. док-та</mat-label>
+        <input matInput formControlName="outgoingNumber" />
+        @if (documentForm.get('outgoingNumber')?.hasError('pattern')) {
+        <mat-error>Должен содержать хотя бы одну цифру</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Дата исх. док-та -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Дата исх. док-та</mat-label>
+        <input
+          matInput
+          [matDatepicker]="outgoingDatePicker"
+          formControlName="outgoingDate"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="outgoingDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #outgoingDatePicker></mat-datepicker>
+
+        @if (documentForm.get('outgoingDate')?.hasError('futureDate')) {
+        <mat-error> Дата не может быть в будущем </mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <!-- Форма доставки -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Форма доставки</mat-label>
+        <mat-select formControlName="deliveryMethod">
+          <mat-option value="Курьер">Курьер</mat-option>
+          <mat-option value="Email">Email</mat-option>
+          <mat-option value="Телефонограмма">Телефонограмма</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Корреспондент -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Корреспондент</mat-label>
+        <mat-select formControlName="correspondent">
+          <mat-option value="ЦБ">ЦБ</mat-option>
+          <mat-option value="ГНИ">ГНИ</mat-option>
+          <mat-option value="ТСЖ">ТСЖ</mat-option>
+        </mat-select>
+
+        @if (documentForm.get('regNumber')?.hasError('required')) {
+        <mat-error>Обязательное поле</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <!-- Тема -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Тема</mat-label>
+        <input matInput formControlName="subject" maxlength="100" />
+        <mat-hint align="end"
+          >{{ documentForm.get("subject")?.value?.length || 0 }}/100</mat-hint
+        >
+
+        @if (documentForm.get('regNumber')?.hasError('required')) {
+        <mat-error>Обязательное поле</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Описание -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Описание</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          maxlength="1000"
+        ></textarea>
+        <mat-hint align="end"
+          >{{
+            documentForm.get("description")?.value?.length || 0
+          }}/1000</mat-hint
+        >
+      </mat-form-field>
+    </div>
+
+    <div class="form-group">
+      <!-- Срок исполнения -->
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Срок исполнения</mat-label>
+        <input
+          matInput
+          [matDatepicker]="executionDatePicker"
+          formControlName="executionDate"
+        />
+        <mat-datepicker-toggle
+          matSuffix
+          [for]="executionDatePicker"
+        ></mat-datepicker-toggle>
+        <mat-datepicker #executionDatePicker></mat-datepicker>
+        @if
+        (documentForm.get('executionDate')?.hasError('invalidExecutionDate')) {
+        <mat-error>
+          Срок исполнения не может быть раньше даты регистрации
+        </mat-error>
+        }
+      </mat-form-field>
+
+      <div class="switches">
+        <mat-slide-toggle formControlName="access">Доступ</mat-slide-toggle>
+        <mat-slide-toggle formControlName="control">Контроль</mat-slide-toggle>
+      </div>
+    </div>
+
+    <!-- <div class="form-group">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Файл</mat-label>
+        <input
+          type="file"
+          (change)="onFileChange($event)"
+          accept=".pdf,.doc,.docx"
+        />
+
+        @if (documentForm.get('file')?.hasError('invalidFormat')) {
+        <mat-error>
+          Недопустимый формат. Разрешены только PDF, DOC, DOCX.
+        </mat-error>
+        } @if (documentForm.get('file')?.hasError('maxSizeExceeded')) {
+        <mat-error> Размер файла превышает 1MB. </mat-error>
+        }
+      </mat-form-field> -->
+
+    <!-- Отображаем загруженный файл и кнопку удаления -->
+    <!-- @if (documentForm.get('file')?.value) {
+      <div class="file-info">
+        <p>Файл: {{ documentForm.get("file")?.value?.name }}</p>
+        <button mat-button color="warn" (click)="removeFile()">Удалить</button>
+      </div>
+      }
+    </div> -->
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Закрыть</button>
+  <button mat-raised-button color="primary" (click)="save()">Сохранить</button>
+</mat-dialog-actions>
