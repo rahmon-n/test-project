@@ -175,8 +175,14 @@
     mat-raised-button
     color="primary"
     (click)="documentData ? close() : save()"
+    [disabled]="isLoading"
   >
-    Сохранить
+    @if (isLoading) {
+    <mat-progress-spinner
+      diameter="20"
+      mode="indeterminate"
+    ></mat-progress-spinner>
+    } @else { Сохранить }
   </button>
   }
 </mat-dialog-actions>

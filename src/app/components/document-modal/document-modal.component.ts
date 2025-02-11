@@ -25,6 +25,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
 import { PrintDialogComponent } from '../print-dialog/print-dialog.component';
@@ -47,6 +48,7 @@ import { environment } from '../../../environments/environments';
     MatDialogActions,
     MatDialogContent,
     MatDialogTitle,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './document-modal.component.html',
   styleUrls: ['./document-modal.component.scss'],
@@ -56,6 +58,7 @@ export class DocumentModalComponent {
   documentForm: FormGroup;
   serverResponse: any = null;
   isLoaded = false;
+  isLoading = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public documentData: any,
@@ -213,6 +216,7 @@ export class DocumentModalComponent {
 
   save(): void {
     if (this.documentForm.valid) {
+      this.isLoading = true;
       this.http
         .post(`${environment.baseUrl}/documents`, this.documentForm.value)
         .subscribe({
@@ -225,6 +229,7 @@ export class DocumentModalComponent {
             this.documentSaved.emit();
             this.serverResponse = response;
             this.isLoaded = true;
+            this.isLoading = false;
           },
           error: (error) => {
             console.error('Upload error', error);
