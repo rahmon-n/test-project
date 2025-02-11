@@ -30,8 +30,12 @@ export class AppComponent implements OnInit {
   }
 
   openModal(): void {
-    this.dialog.open(DocumentModalComponent, {
+    const dialogRef = this.dialog.open(DocumentModalComponent, {
       width: '600px',
+    });
+
+    dialogRef.componentInstance.documentSaved.subscribe(() => {
+      this.fetchDocuments();
     });
   }
 }

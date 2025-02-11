@@ -1,4 +1,6 @@
-<h2 mat-dialog-title>Реквизиты входящего документа</h2>
+<h2 mat-dialog-title>
+  {{ documentData ? "Редактирование документа" : "Создание документа" }}
+</h2>
 <mat-dialog-content>
   <form class="doc-form" [formGroup]="documentForm">
     <div class="form-group">
@@ -166,5 +168,15 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()">Закрыть</button>
-  <button mat-raised-button color="primary" (click)="save()">Сохранить</button>
+  @if (isLoaded) {
+  <button mat-raised-button color="primary" (click)="print()">Печать</button>
+  } @else {
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="documentData ? close() : save()"
+  >
+    Сохранить
+  </button>
+  }
 </mat-dialog-actions>

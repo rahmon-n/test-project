@@ -1,5 +1,5 @@
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Inject, Output } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -13,6 +13,8 @@ import {
   MAT_DATE_LOCALE,
 } from '@angular/material/core';
 import {
+  MAT_DIALOG_DATA,
+  MatDialog,
   MatDialogActions,
   MatDialogContent,
   MatDialogRef,
@@ -25,7 +27,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
-import { DocumentTableComponent } from '../table/table.component';
+import { PrintDialogComponent } from '../print-dialog/print-dialog.component';
 
 @Component({
   selector: 'app-document-modal',
@@ -49,31 +51,57 @@ import { DocumentTableComponent } from '../table/table.component';
   styleUrls: ['./document-modal.component.scss'],
 })
 export class DocumentModalComponent {
+  @Output() documentSaved = new EventEmitter<void>();
   documentForm: FormGroup;
+  serverResponse: any = null;
+  isLoaded = false;
 
   constructor(
+    @Inject(MAT_DIALOG_DATA) public documentData: any,
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<DocumentModalComponent>,
     private snackbar: MatSnackBar,
-    private http: HttpClient
+    private http: HttpClient,
+    private printDialog: MatDialog
   ) {
     this.documentForm = this.fb.group(
       {
         regNumber: [
-          '',
+          documentData?.regNumber || '',
           [Validators.required, Validators.pattern(/^(?=.*\d)[\w\W]+$/)],
         ],
-        regDate: [new Date(), [Validators.required, this.validateTodayDate]],
-        outgoingNumber: ['', [Validators.pattern(/^(?=.*\d)[\w\W]+$/)]],
-        outgoingDate: [null, this.validateOutgoingDate],
-        deliveryMethod: [''],
-        correspondent: ['', Validators.required],
-        subject: ['', [Validators.required, Validators.maxLength(100)]],
-        description: ['', [Validators.maxLength(1000)]],
-        executionDate: [null],
-        access: [false],
-        control: [false],
-        file: [null],
+        regDate: [
+          documentData?.regDate ? new Date(documentData.regDate) : new Date(),
+          [Validators.required, this.validateTodayDate],
+        ],
+        outgoingNumber: [
+          documentData?.outgoingNumber || '',
+          [Validators.pattern(/^(?=.*\d)[\w\W]+$/)],
+        ],
+        outgoingDate: [
+          documentData?.outgoingDate
+            ? new Date(documentData.outgoingDate)
+            : null,
+          this.validateOutgoingDate,
+        ],
+        deliveryMethod: [documentData?.deliveryMethod || ''],
+        correspondent: [documentData?.correspondent || '', Validators.required],
+        subject: [
+          documentData?.subject || '',
+          [Validators.required, Validators.maxLength(100)],
+        ],
+        description: [
+          documentData?.description || '',
+          [Validators.maxLength(1000)],
+        ],
+        executionDate: [
+          documentData?.executionDate
+            ? new Date(documentData.executionDate)
+            : null,
+        ],
+        access: [documentData?.access || false],
+        control: [documentData?.control || false],
+        file: [documentData?.file || null], // Если файл есть, подставляем его путь
       },
       { validators: this.validateExecutionDate }
     );
@@ -94,7 +122,6 @@ export class DocumentModalComponent {
     return null;
   }
 
-  // Валидатор: исходящая дата не может быть в будущем
   validateOutgoingDate(control: AbstractControl) {
     const selectedDate = new Date(control.value);
     const today = new Date();
@@ -172,30 +199,36 @@ export class DocumentModalComponent {
     this.documentForm.patchValue({ file: null });
   }
 
+  print(): void {
+    this.printDialog.open(PrintDialogComponent, {
+      data: { document: this.serverResponse },
+    });
+    this.close();
+  }
+
   close(): void {
     this.dialogRef.close();
   }
 
   save(): void {
     if (this.documentForm.valid) {
-      console.log('Форма сохранена', this.documentForm.value);
-
       this.http
         .post('http://localhost:3000/documents', this.documentForm.value)
         .subscribe({
           next: (response: any) => {
-            console.log(response);
             this.snackbar.open('Документ сохранен', 'Закрыть', {
               duration: 3000,
               horizontalPosition: 'center',
               verticalPosition: 'top',
             });
+            this.documentSaved.emit();
+            this.serverResponse = response;
+            this.isLoaded = true;
           },
           error: (error) => {
             console.error('Upload error', error);
           },
         });
-      // this.dialogRef.close(this.documentForm.value);
     } else {
       this.documentForm.markAllAsTouched();
     }

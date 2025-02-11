@@ -12,6 +12,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatDialog } from '@angular/material/dialog';
+import { DocumentModalComponent } from '../document-modal/document-modal.component';
+import { PrintDialogComponent } from '../print-dialog/print-dialog.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'doc-table',
@@ -23,26 +27,26 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     MatIconModule,
     MatTableModule,
     MatSortModule,
+    DatePipe,
   ],
 })
 export class DocumentTableComponent implements AfterViewInit, OnChanges {
   @Input() documents: any[] = [];
   dataSource = new MatTableDataSource<any>([]);
   displayedColumns: string[] = [
-    'id',
-    'correspondent',
-    'access',
-    'control',
-    'deliveryMethod',
-    'executionDate',
-    'file',
+    'regNumber',
     'regDate',
+    'outgoingNumber',
+    'outgoingDate',
+    'file',
+    'correspondent',
     'subject',
+    'actions',
   ];
 
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private dialog: MatDialog) {}
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
@@ -58,5 +62,19 @@ export class DocumentTableComponent implements AfterViewInit, OnChanges {
 
       this.cdr.detectChanges();
     }
+  }
+
+  openEditDialog(document: any): void {
+    this.dialog.open(DocumentModalComponent, {
+      width: '600px',
+      data: document,
+    });
+  }
+
+  openPrintDialog(document: any): void {
+    this.dialog.open(PrintDialogComponent, {
+      width: '600px',
+      data: { document },
+    });
   }
 }
