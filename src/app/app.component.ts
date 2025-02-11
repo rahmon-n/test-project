@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DocumentModalComponent } from './components/document-modal/document-modal.component';
 import { HttpClient } from '@angular/common/http';
 import { DocumentTableComponent } from './components/table/table.component';
+import { environment } from '../environments/environments';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,7 @@ export class AppComponent implements OnInit {
   }
 
   fetchDocuments() {
-    this.http.get('http://localhost:3000/documents').subscribe({
+    this.http.get(`${environment.baseUrl}/documents`).subscribe({
       next: (data: any) => {
         this.documents = data;
       },

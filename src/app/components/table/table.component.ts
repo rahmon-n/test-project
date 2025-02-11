@@ -16,6 +16,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DocumentModalComponent } from '../document-modal/document-modal.component';
 import { PrintDialogComponent } from '../print-dialog/print-dialog.component';
 import { DatePipe } from '@angular/common';
+import { environment } from '../../../environments/environments';
 
 @Component({
   selector: 'doc-table',
@@ -31,6 +32,7 @@ import { DatePipe } from '@angular/common';
   ],
 })
 export class DocumentTableComponent implements AfterViewInit, OnChanges {
+  baseUrl = environment.baseUrl;
   @Input() documents: any[] = [];
   dataSource = new MatTableDataSource<any>([]);
   displayedColumns: string[] = [

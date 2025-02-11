@@ -28,6 +28,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpClient } from '@angular/common/http';
 import { PrintDialogComponent } from '../print-dialog/print-dialog.component';
+import { environment } from '../../../environments/environments';
 
 @Component({
   selector: 'app-document-modal',
@@ -184,7 +185,7 @@ export class DocumentModalComponent {
     formData.append('file', file);
 
     this.http
-      .post('http://localhost:3000/documents/upload', formData)
+      .post(`${environment.baseUrl}/documents/upload`, formData)
       .subscribe({
         next: (response: any) => {
           this.documentForm.patchValue({ file: response?.file.path });
@@ -213,7 +214,7 @@ export class DocumentModalComponent {
   save(): void {
     if (this.documentForm.valid) {
       this.http
-        .post('http://localhost:3000/documents', this.documentForm.value)
+        .post(`${environment.baseUrl}/documents`, this.documentForm.value)
         .subscribe({
           next: (response: any) => {
             this.snackbar.open('Документ сохранен', 'Закрыть', {

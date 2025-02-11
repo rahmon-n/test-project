@@ -7,6 +7,7 @@ import {
   MatDialogContent,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { environment } from '../../../environments/environments';
 
 @Component({
   selector: 'print-dialog',
@@ -50,10 +51,7 @@ import {
       <p>
         <strong>Файл:</strong>
         @if (data.document.file) {
-        <a
-          [href]="'http://localhost:3000/' + data.document.file"
-          target="_blank"
-        >
+        <a [href]="baseUrl + '/' + data.document.file" target="_blank">
           Посмотреть файл</a
         >
         } @else { Нет файла }
@@ -79,6 +77,8 @@ export class PrintDialogComponent {
   constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
     console.log('Data:', data);
   }
+
+  baseUrl = environment.baseUrl;
 
   print() {
     window.print();
