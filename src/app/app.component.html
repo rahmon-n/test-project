@@ -1,6 +1,9 @@
 <main>
   <mat-toolbar class="toolbar">
     <span>Реестр документов</span>
-    <button mat-button class="toolbar-btn" (click)="openModal()">Добавить документ</button>
+    <button mat-button class="toolbar-btn" (click)="openModal()">
+      Добавить документ
+    </button>
   </mat-toolbar>
+  <doc-table [documents]="documents"></doc-table>
 </main>

@@ -144,15 +144,14 @@
       </div>
     </div>
 
-    <!-- <div class="form-group">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Файл</mat-label>
+    <div>
+      <mat-label>Файл</mat-label>
+      <div>
         <input
           type="file"
           (change)="onFileChange($event)"
           accept=".pdf,.doc,.docx"
         />
-
         @if (documentForm.get('file')?.hasError('invalidFormat')) {
         <mat-error>
           Недопустимый формат. Разрешены только PDF, DOC, DOCX.
@@ -160,16 +159,8 @@
         } @if (documentForm.get('file')?.hasError('maxSizeExceeded')) {
         <mat-error> Размер файла превышает 1MB. </mat-error>
         }
-      </mat-form-field> -->
-
-    <!-- Отображаем загруженный файл и кнопку удаления -->
-    <!-- @if (documentForm.get('file')?.value) {
-      <div class="file-info">
-        <p>Файл: {{ documentForm.get("file")?.value?.name }}</p>
-        <button mat-button color="warn" (click)="removeFile()">Удалить</button>
       </div>
-      }
-    </div> -->
+    </div>
   </form>
 </mat-dialog-content>
 

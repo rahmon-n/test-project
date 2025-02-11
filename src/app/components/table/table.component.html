@@ -1,0 +1,77 @@
+<table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
+  <!-- ID Column -->
+  <ng-container matColumnDef="id">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+  </ng-container>
+
+  <!-- Correspondent Column -->
+  <ng-container matColumnDef="correspondent">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Correspondent</th>
+    <td mat-cell *matCellDef="let element">{{ element.correspondent }}</td>
+  </ng-container>
+
+  <!-- Access Column (Checkbox) -->
+  <ng-container matColumnDef="access">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Access</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-checkbox [checked]="element.access" disabled></mat-checkbox>
+    </td>
+  </ng-container>
+
+  <!-- Control Column (Checkbox) -->
+  <ng-container matColumnDef="control">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Control</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-checkbox [checked]="element.control" disabled></mat-checkbox>
+    </td>
+  </ng-container>
+
+  <!-- Delivery Method Column -->
+  <ng-container matColumnDef="deliveryMethod">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Delivery</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.deliveryMethod || "-" }}
+    </td>
+  </ng-container>
+
+  <!-- Execution Date Column -->
+  <ng-container matColumnDef="executionDate">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Execution Date</th>
+    <td mat-cell *matCellDef="let element">
+      {{ element.executionDate ? element.executionDate : "-" }}
+    </td>
+  </ng-container>
+
+  <!-- File Column (Download Link) -->
+  <ng-container matColumnDef="file">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>File</th>
+    <td mat-cell *matCellDef="let element">
+      @if (element.file) {
+      <a [href]="'http://localhost:3000/' + element.file" target="_blank">
+        <div class="file-col"><mat-icon>attach_file</mat-icon> Document</div>
+      </a>
+      } @if (!element.file) {
+      <span>-</span>
+      }
+    </td>
+  </ng-container>
+
+  <!-- Registered Date Column -->
+  <ng-container matColumnDef="regDate">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Reg. Date</th>
+    <td mat-cell *matCellDef="let element">
+      <!-- {{ element.regDate | date : "yyyy-MM-dd HH:mm" }} -->
+    </td>
+  </ng-container>
+
+  <!-- Subject Column -->
+  <ng-container matColumnDef="subject">
+    <th mat-sort-header mat-header-cell *matHeaderCellDef>Subject</th>
+    <td mat-cell *matCellDef="let element">{{ element.subject }}</td>
+  </ng-container>
+
+  <!-- Header & Row Definitions -->
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>

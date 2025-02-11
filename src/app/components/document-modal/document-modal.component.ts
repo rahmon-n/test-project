@@ -1,3 +1,4 @@
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Component } from '@angular/core';
 import {
   FormBuilder,
@@ -23,6 +24,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { HttpClient } from '@angular/common/http';
+import { DocumentTableComponent } from '../table/table.component';
 
 @Component({
   selector: 'app-document-modal',
@@ -50,7 +53,9 @@ export class DocumentModalComponent {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<DocumentModalComponent>
+    private dialogRef: MatDialogRef<DocumentModalComponent>,
+    private snackbar: MatSnackBar,
+    private http: HttpClient
   ) {
     this.documentForm = this.fb.group(
       {
@@ -60,12 +65,12 @@ export class DocumentModalComponent {
         ],
         regDate: [new Date(), [Validators.required, this.validateTodayDate]],
         outgoingNumber: ['', [Validators.pattern(/^(?=.*\d)[\w\W]+$/)]],
-        outgoingDate: ['', this.validateOutgoingDate],
+        outgoingDate: [null, this.validateOutgoingDate],
         deliveryMethod: [''],
         correspondent: ['', Validators.required],
         subject: ['', [Validators.required, Validators.maxLength(100)]],
         description: ['', [Validators.maxLength(1000)]],
-        executionDate: [''],
+        executionDate: [null],
         access: [false],
         control: [false],
         file: [null],
@@ -78,11 +83,10 @@ export class DocumentModalComponent {
     });
   }
 
-  // Валидатор: дата регистрации должна быть сегодняшним днем
   validateTodayDate(control: AbstractControl): ValidationErrors | null {
     const selectedDate = new Date(control.value);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Обнуляем время для корректного сравнения
+    today.setHours(0, 0, 0, 0);
 
     if (selectedDate.toDateString() !== today.toDateString()) {
       return { notToday: true };
@@ -127,12 +131,13 @@ export class DocumentModalComponent {
     if (!input.files?.length) return;
 
     const file = input.files[0];
+    console.log(file);
     const allowedTypes = [
       'application/pdf',
       'application/msword',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ];
-    const maxSize = 1 * 1024 * 1024; // 1MB
+    const maxSize = 1 * 1024 * 1024;
 
     if (!allowedTypes.includes(file.type)) {
       this.documentForm.get('file')?.setErrors({ invalidFormat: true });
@@ -144,7 +149,23 @@ export class DocumentModalComponent {
       return;
     }
 
-    this.documentForm.patchValue({ file });
+    this.uploadFile(file);
+  }
+
+  uploadFile(file: File): void {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    this.http
+      .post('http://localhost:3000/documents/upload', formData)
+      .subscribe({
+        next: (response: any) => {
+          this.documentForm.patchValue({ file: response?.file.path });
+        },
+        error: (error) => {
+          console.error('Upload error', error);
+        },
+      });
   }
 
   removeFile(): void {
@@ -158,7 +179,23 @@ export class DocumentModalComponent {
   save(): void {
     if (this.documentForm.valid) {
       console.log('Форма сохранена', this.documentForm.value);
-      this.dialogRef.close(this.documentForm.value);
+
+      this.http
+        .post('http://localhost:3000/documents', this.documentForm.value)
+        .subscribe({
+          next: (response: any) => {
+            console.log(response);
+            this.snackbar.open('Документ сохранен', 'Закрыть', {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+            });
+          },
+          error: (error) => {
+            console.error('Upload error', error);
+          },
+        });
+      // this.dialogRef.close(this.documentForm.value);
     } else {
       this.documentForm.markAllAsTouched();
     }
